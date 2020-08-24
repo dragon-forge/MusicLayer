@@ -44,7 +44,7 @@ minecraft {
     runDir = "run"
     mappings = "${config.mcp}"
     makeObfSourceJar = false
-	replace 'required-after:hammercore', "required-after:hammercore@[${config.hc_version},)"
+	replace 'required-after:hammercore', "required-after:hammercore@[${config.hl_version},)"
     replace '@VERSION@', "${config.mod_version}"
 	replace '@FINGERPRINT@', project.findProperty('signSHA1')
 }
@@ -121,12 +121,6 @@ curseforge {
 		mainArtifact(jar) {
 		  displayName = "[${config.minecraft_version}] ${config.mod_name} - ${config.mod_version}"
 		}
-		addArtifact(deobfJar) {
-		  displayName = "[${config.minecraft_version}] ${config.mod_name} (Deobfuscated) - ${config.mod_version}"
-		}
-		addArtifact(srcJar) {
-		  displayName = "[${config.minecraft_version}] ${config.mod_name} (Sources) - ${config.mod_version}"
-		}
 		relations {
             requiredLibrary 'Hammer-Lib'
         }
@@ -180,7 +174,7 @@ task makeChangelog(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
 <h1>Changes:</h1>
   <ul>
     {{#commits}}
-    <li><a href="${config.git_commit}" target=_blank> {{{message}}}</a></li>
+    <li> {{{message}}}</li>
     {{/commits}}
   </ul>
 {{/tags}}

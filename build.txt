@@ -1,7 +1,7 @@
 #Project info
 author=Zeitheron
-start_git_commit=?
-git_commit=https://gitlab.com/Zeitheron/???/commit/{{hash}}
+start_git_commit=f44d92f5589c5901cfdd1df54ae2e5f7165dee26
+git_commit=https://gitlab.com/DragonForge/musiclayer/commit/{{hash}}
 
 #Runtime info
 forge_version=14.23.5.2847
