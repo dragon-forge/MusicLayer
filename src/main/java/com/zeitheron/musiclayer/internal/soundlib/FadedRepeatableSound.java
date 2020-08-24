@@ -3,7 +3,7 @@ package com.zeitheron.musiclayer.internal.soundlib;
 import com.zeitheron.musiclayer.api.IInput;
 import com.zeitheron.musiclayer.internal.InputSLWrapper;
 import com.zeitheron.musiclayer.internal.soundlib.SoundlibSoundAdapter;
-import com.zeitheron.sound.RepeatableSound;
+import tk.zeitheron.sound.RepeatableSound;
 
 import javax.sound.sampled.FloatControl.Type;
 import javax.sound.sampled.LineUnavailableException;

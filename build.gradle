@@ -51,8 +51,8 @@ minecraft {
 
 repositories {
     maven {
-        name = "CurseForge"
-        url = "https://minecraft.curseforge.com/api/maven/"
+        name = "DragonForge"
+        url = "https://raw.github.com/dragon-forge/maven/master"
     }
     maven {
         name = "jei"
@@ -61,7 +61,7 @@ repositories {
 }
 
 dependencies {
-	deobfCompile "hammer-lib:HammerCore-${config.minecraft_version}:${config.hc_version}:deobf"
+	deobfCompile "tk.zeitheron.HammerLib:HammerLib-${config.minecraft_version}:${config.hl_version}:deobf"
 	
     deobfCompile "mezz.jei:jei_${config.minecraft_version}:${config.jei_version}:api"
     runtime "mezz.jei:jei_${config.minecraft_version}:${config.jei_version}"
@@ -88,8 +88,6 @@ task deobfJar(type: Jar) {
     classifier = 'deobf'
     manifest {
         attributes 'FMLAT': "${config.mod_id}_at.cfg"
-        attributes 'FMLCorePlugin': 'com.zeitheron.musiclayer.MusicLayerCore'
-        attributes 'FMLCorePluginContainsFMLMod': 'false'
     }
 }
 
@@ -98,16 +96,12 @@ task srcJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
 	manifest {
         attributes 'FMLAT': "${config.mod_id}_at.cfg"
-		attributes 'FMLCorePlugin': 'com.zeitheron.musiclayer.MusicLayerCore'
-        attributes 'FMLCorePluginContainsFMLMod': 'false'
     }
 }
 
 jar {
 	manifest {
 		attributes 'FMLAT': "${config.mod_id}_at.cfg"
-		attributes 'FMLCorePlugin': 'com.zeitheron.musiclayer.MusicLayerCore'
-        attributes 'FMLCorePluginContainsFMLMod': 'false'
 	}
 }
 

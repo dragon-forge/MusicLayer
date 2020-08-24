@@ -9,7 +9,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import com.zeitheron.musiclayer.api.IInput;
 import com.zeitheron.musiclayer.internal.InputSLWrapper;
-import com.zeitheron.sound.RepeatableSound;
+import tk.zeitheron.sound.RepeatableSound;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.Vec3d;

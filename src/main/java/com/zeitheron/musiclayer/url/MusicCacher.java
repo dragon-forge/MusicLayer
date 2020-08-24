@@ -1,11 +1,11 @@
 package com.zeitheron.musiclayer.url;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import com.zeitheron.hammercore.lib.zlib.io.IOUtils;
+import com.zeitheron.hammercore.lib.zlib.tuple.TwoTuple;
+import com.zeitheron.hammercore.lib.zlib.utils.MD5;
+import com.zeitheron.musiclayer.MusicLayerMC;
+
+import java.io.*;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -14,37 +14,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipInputStream;
 
-import com.zeitheron.hammercore.lib.zlib.io.IOUtils;
-import com.zeitheron.hammercore.lib.zlib.tuple.TwoTuple;
-import com.zeitheron.hammercore.lib.zlib.utils.MD5;
-import com.zeitheron.musiclayer.MusicLayerCore;
-
 public class MusicCacher
 {
 	private static final Map<String, Thread> md5Threads = new HashMap<>();
 	private static final Map<String, Thread> parallelThreads = new HashMap<>();
 	private static final List<String> delUrls = new ArrayList<>();
-	
+
 	public static InputStream getMusicStream(final String url)
 	{
 		return getFileStream(url, "music");
 	}
-	
-	/** May be used to load archives and cache them. */
+
+	/**
+	 * May be used to load archives and cache them.
+	 */
 	public static ZipInputStream getZipStream(final String url)
 	{
 		return new ZipInputStream(getFileStream(url, "archives"));
 	}
-	
+
 	private static InputStream getFileStream(final String url, String subfolder)
 	{
-		File f = new File(MusicLayerCore.mcPath, "musiclayer" + File.separator + subfolder);
+		File f = new File(MusicLayerMC.mcPath, "musiclayer" + File.separator + subfolder);
 		if(!f.isDirectory())
 			f.mkdirs();
-		
+
 		f = new File(f, MD5.encrypt(url));
 		final File ff = f;
-		
+
 		if(f.isFile())
 		{
 			if(delUrls.contains(url))
@@ -55,49 +52,49 @@ public class MusicCacher
 				{
 					String md5 = MD5.getMD5Checksum(ff.getAbsolutePath());
 					TwoTuple<InputStream, Boolean> b = IOUtils.getInput(url);
-					
+
 					/** Verify only if file is being loaded from online */
 					if(b.get2() == Boolean.TRUE)
 					{
 						InputStream in = b.get1();
 						String live = getMD5Checksum(in);
-						
+
 						if(!md5.equals(live))
 							delUrls.add(url);
 					}
-					
+
 					md5Threads.remove(url);
 				});
-				
+
 				t.setName("MusicLayer#MusicMD5Thread#" + md5Threads.size());
 				t.start();
-				
+
 				md5Threads.put(url, t);
 			}
 		}
-		
+
 		if(!f.isFile() && !parallelThreads.containsKey(url))
 		{
 			Thread t = new Thread(() ->
 			{
 				InputStream inp = IOUtils.getInput(url).get1();
-				
-				try(FileOutputStream fos = new FileOutputStream(ff);InputStream in = inp)
+
+				try(FileOutputStream fos = new FileOutputStream(ff); InputStream in = inp)
 				{
 					IOUtils.pipeData(in, fos);
 				} catch(IOException er)
 				{
 				}
-				
+
 				parallelThreads.remove(url);
 			});
-			
+
 			t.setName("MusicLayer#MusicDwnThread#" + parallelThreads.size());
 			t.start();
-			
+
 			parallelThreads.put(url, t);
 		}
-		
+
 		if(f.isFile())
 			try
 			{
@@ -106,10 +103,10 @@ public class MusicCacher
 			{
 				e.printStackTrace();
 			}
-		
+
 		return IOUtils.getInput(url).get1();
 	}
-	
+
 	public static String getMD5Checksum(InputStream input)
 	{
 		byte[] b = null;
@@ -126,7 +123,7 @@ public class MusicCacher
 			md5Hex = "0" + md5Hex;
 		return md5Hex;
 	}
-	
+
 	public static byte[] createChecksum(InputStream input) throws Exception
 	{
 		int numRead;

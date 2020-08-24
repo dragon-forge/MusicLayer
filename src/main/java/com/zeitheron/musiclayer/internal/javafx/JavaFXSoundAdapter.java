@@ -1,13 +1,13 @@
 package com.zeitheron.musiclayer.internal.javafx;
 
 import com.sun.javafx.application.PlatformImpl;
+import com.zeitheron.musiclayer.api.IInput;
 import com.zeitheron.musiclayer.api.adapter.IAdaptedSound;
 import com.zeitheron.musiclayer.api.adapter.ISoundAdapter;
 import com.zeitheron.musiclayer.internal.DummySound;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
-import java.io.InputStream;
 import java.net.URL;
 
 public class JavaFXSoundAdapter
@@ -21,7 +21,7 @@ public class JavaFXSoundAdapter
 	}
 
 	@Override
-	public IAdaptedSound createSimpleStreamingSound(InputStream stream)
+	public IAdaptedSound createSimpleStreamingSound(IInput stream)
 	{
 		return new DummySound(this);
 	}

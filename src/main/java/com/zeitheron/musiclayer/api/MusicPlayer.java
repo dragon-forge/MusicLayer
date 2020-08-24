@@ -90,7 +90,7 @@ public class MusicPlayer
 		for(FadedRepeatableSound snd : allTickedSounds)
 		{
 			snd.fadeSpeed = fadingSpeed;
-			if(snd == null || snd.getVolume() <= 0F || snd.isDonePlaying())
+			if(snd.getVolume() <= 0F || snd.isDonePlaying())
 			{
 				pendingRemove.add(snd);
 				snd.dispose();
@@ -138,7 +138,16 @@ public class MusicPlayer
 
 		try
 		{
-			GetMusicEvent gme = new GetMusicEvent(Minecraft.getMinecraft().player, null, this, "Nothing");
+			double currentLength = 0, currentPlayTime = 0, currentLeftTime = 0;
+
+			if(prevSound != null)
+			{
+				currentPlayTime = prevSound.getPlayedSeconds();
+				currentLeftTime = prevSound.getTimeLeftInSeconds();
+				currentLength = prevSound.getDurationInSeconds();
+			}
+
+			GetMusicEvent gme = new GetMusicEvent(Minecraft.getMinecraft().player, null, this, "Nothing", currentLength, currentPlayTime, currentLeftTime);
 			getDefMusic(gme);
 			BUS.post(gme);
 
@@ -150,12 +159,12 @@ public class MusicPlayer
 					prevSound.fadeSpeed = fadingSpeed;
 					prevSound.play();
 					prevSound.fadeIn();
-				} else if(!prevSound.sound.toString().equals(gme.getName()))
+				} else if(!prevSound.sound.equals(gme.getName()) || gme.restart)
 				{
 					/** Update possible alternative music */
 					EvtBus.postSafe(BUS, new UpdateAlternativeMusicEvent(this));
 
-					gme = new GetMusicEvent(Minecraft.getMinecraft().player, null, this, "Nothing");
+					gme = new GetMusicEvent(Minecraft.getMinecraft().player, null, this, "Nothing", currentLength, currentPlayTime, currentLeftTime);
 					getDefMusic(gme);
 					BUS.post(gme);
 
@@ -175,6 +184,7 @@ public class MusicPlayer
 
 		} catch(Throwable err)
 		{
+			err.printStackTrace();
 		}
 	}
 

@@ -3,7 +3,7 @@ package com.zeitheron.musiclayer.internal.soundlib;
 import com.zeitheron.musiclayer.api.adapter.IAdaptedSound;
 import com.zeitheron.musiclayer.api.adapter.ISoundAdapter;
 import com.zeitheron.musiclayer.api.adapter.SoundAdapters;
-import com.zeitheron.sound.ISound;
+import tk.zeitheron.sound.ISound;
 
 import javax.sound.sampled.FloatControl;
 

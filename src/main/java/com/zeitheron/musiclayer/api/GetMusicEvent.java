@@ -2,7 +2,6 @@ package com.zeitheron.musiclayer.api;
 
 import com.zeitheron.musiclayer.url.MusicCacher;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -16,13 +15,19 @@ public class GetMusicEvent extends PlayerEvent
 	public final MusicPlayer thread;
 	public IInput music;
 	public String name;
+	public boolean restart;
+
+	public final double currentLength, currentPlayTime, currentLeftTime;
 	
-	public GetMusicEvent(EntityPlayer player, IInput music, MusicPlayer thread, String name)
+	public GetMusicEvent(EntityPlayer player, IInput music, MusicPlayer thread, String name, double currentLength, double currentPlayTime, double currentLeftTime)
 	{
 		super(player);
 		this.thread = thread;
 		this.music = music;
 		this.name = name;
+		this.currentLength = currentLength;
+		this.currentPlayTime = currentPlayTime;
+		this.currentLeftTime = currentLeftTime;
 	}
 	
 	public String getName()

@@ -11,6 +11,8 @@ public class TestDefaultPlayer
 	@SubscribeEvent
 	public void music(GetMusicEvent e) throws MalformedURLException
 	{
+		if(e.currentLeftTime < 5)
+			e.restart = true;
 		e.setSound(new File("C:\\Users\\Zeitheron\\Downloads\\eerie.ogg").toURI().toURL().toString());
 	}
 }
