@@ -2,7 +2,7 @@
 #Mod info
 mod_id=musiclayer
 mod_id_fancy=MusicLayer
-mod_name=Music Layer
+mod_name=MusicLayer
 mod_version=12.2.22
 
 #Project info
