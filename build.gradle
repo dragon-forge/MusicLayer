@@ -17,6 +17,7 @@ buildscript {
 
 plugins {
     id 'net.ltgt.apt' version '0.10'
+    id "com.modrinth.minotaur" version "2.+"
     id 'com.matthewprenger.cursegradle' version '1.4.0'
     id 'se.bjurr.gitchangelog.git-changelog-gradle-plugin' version '1.56'
 }
@@ -97,8 +98,8 @@ repositories {
 
 dependencies {
     implementation("net.minecraftforge:mergetool:0.2.3.3") { force = true }
-    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
-	
+    minecraft 'net.minecraftforge:forge:1.12.2-' + config.forge_version
+
     implementation "org.zeith.HammerLib:HammerLib-${config.minecraft_version}:${config.hl_version}"
 
     ////// UTILITY STUFF //////
@@ -200,15 +201,15 @@ jar {
 
     manifest {
         attributes([
-                "FMLAT"                      : "accesstransformer.cfg",
+                "FMLAT"                   : "accesstransformer.cfg",
 
-                "Specification-Title"        : "MusicLayer",
-                "Specification-Vendor"       : "DragonForge",
-                "Specification-Version"      : "1", // We are version 1 of ourselves
-                "Implementation-Title"       : "MusicLayer",
-                "Implementation-Version"     : config.mod_version,
-                "Implementation-Vendor"      : "DragonForge",
-                "Implementation-Timestamp"   : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                "Specification-Title"     : "MusicLayer",
+                "Specification-Vendor"    : "DragonForge",
+                "Specification-Version"   : "1", // We are version 1 of ourselves
+                "Implementation-Title"    : "MusicLayer",
+                "Implementation-Version"  : config.mod_version,
+                "Implementation-Vendor"   : "DragonForge",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
 }
@@ -228,40 +229,217 @@ task signJar(type: SignJar, dependsOn: jar) {
 }
 
 jar.finalizedBy('reobfJar')
+publish.dependsOn('reobfJar')
+build.dependsOn signJar
 assemble.finalizedBy('signJar')
 signJar.finalizedBy('cleanReplaces')
 
-curseforge {
-	apiKey = System.env.CURSEFORGE_API_KEY != null ? System.env.CURSEFORGE_API_KEY : '0'
-	project {
-		id = "${config.cf_project}"
-		changelogType = 'html'
-		changelog = file('changelog.html')
-		releaseType = "${config.release_type}"
-		addGameVersion "${config.minecraft_version}"
-		mainArtifact(jar) {
-		  displayName = "[${config.minecraft_version}] ${config.mod_name} - ${config.mod_version}"
-		}
-		relations {
-            requiredLibrary 'Hammer-Lib'
-        }
-	}
+task deobfJar(type: Jar) {
+    archiveClassifier = 'deobf'
+    from sourceSets.main.output
+    manifest {
+        attributes(["Specification-Title"     : config.mod_id,
+                    "Specification-Vendor"    : "Zeitheron",
+                    "Specification-Version"   : "1",
+                    "Implementation-Title"    : project.name,
+                    "Implementation-Version"  : archiveVersion,
+                    "Implementation-Vendor"   : config.mod_authors,
+                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                    "MixinConfigs"            : "mixins.${config.mod_id}.json"
+        ])
+    }
 }
 
-task makeChangelog(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
-    file = new File("changelog.html")
-    untaggedName = "Version ${project.version}"
-    fromCommit = "${config.start_git_commit}"
-    toRef =  "HEAD"
-    gitHubIssuePattern = "nonada123";
-    templateContent = """
-{{#tags}}
-<h1>Changes:</h1>
-  <ul>
-    {{#commits}}
-    <li> {{{message}}}</li>
-    {{/commits}}
-  </ul>
-{{/tags}}
-"""
+task srcJar(type: Jar, dependsOn: classes) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+
+artifacts {
+    archives deobfJar
+    archives srcJar
+}
+
+modrinth {
+    token = System.env.MODRINTH_TOKEN != null ? System.env.MODRINTH_TOKEN : "NONE"
+    projectId = config.modrinth_project
+    versionNumber = config.mod_version
+    versionType = config.release_type
+    uploadFile = jar
+    gameVersions = [config.minecraft_version]
+    dependencies {
+        def mods = config.required_mods.split(";")
+        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+            for (final def one in mods) {
+                if (one.isBlank()) continue
+                if (one.startsWith("@")) {
+                    def pars = one.substring(1).split(":", 2)
+                    if (pars[0].equalsIgnoreCase("m")) {
+                        required.project pars[1].trim()
+                    }
+                } else
+                    required.project one.trim()
+            }
+
+        mods = config.optional_mods.split(";")
+        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+            for (final def one in mods) {
+                if (one.isBlank()) continue
+                if (one.startsWith("@")) {
+                    def pars = one.substring(1).split(":", 2)
+                    if (pars[0].equalsIgnoreCase("m")) {
+                        optional.project pars[1].trim()
+                    }
+                } else
+                    optional.project one.trim()
+            }
+
+        mods = config.incompatible_mods.split(";")
+        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+            for (final def one in mods) {
+                if (one.isBlank()) continue
+                if (one.startsWith("@")) {
+                    def pars = one.substring(1).split(":", 2)
+                    if (pars[0].equalsIgnoreCase("m")) {
+                        incompatible.project pars[1].trim()
+                    }
+                } else
+                    incompatible.project one.trim()
+            }
+
+        mods = config.embedded_mods.split(";")
+        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+            for (final def one in mods) {
+                if (one.isBlank()) continue
+                if (one.startsWith("@")) {
+                    def pars = one.substring(1).split(":", 2)
+                    if (pars[0].equalsIgnoreCase("m")) {
+                        embedded.project pars[1].trim()
+                    }
+                } else
+                    embedded.project one.trim()
+            }
+    }
+}
+
+curseforge {
+    apiKey = System.env.CURSEFORGE_TOKEN != null ? System.env.CURSEFORGE_TOKEN : "NONE"
+    project {
+        id = config.cf_project
+        changelogType = 'html'
+        changelog = ""
+        releaseType = config.release_type
+        addGameVersion config.minecraft_version
+        addGameVersion "Forge"
+        mainArtifact(jar) {
+            displayName = "[${config.minecraft_version}] ${config.mod_name} - ${config.mod_version}"
+        }
+
+        def reqDeps = new ArrayList()
+        def optDeps = new ArrayList()
+        def incompat = new ArrayList()
+        def embLibs = new ArrayList()
+
+        def mods = config.required_mods.split(";")
+        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+            for (final def one in mods) {
+                if (one.isBlank()) continue
+                if (one.startsWith("@")) {
+                    def pars = one.substring(1).split(":", 2)
+                    if (pars[0].equalsIgnoreCase("c")) {
+                        reqDeps.add pars[1].trim()
+                    }
+                } else
+                    reqDeps.add one.trim()
+            }
+
+        mods = config.optional_mods.split(";")
+        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+            for (final def one in mods) {
+                if (one.isBlank()) continue
+                if (one.startsWith("@")) {
+                    def pars = one.substring(1).split(":", 2)
+                    if (pars[0].equalsIgnoreCase("c")) {
+                        optDeps.add pars[1].trim()
+                    }
+                } else
+                    optDeps.add one.trim()
+            }
+
+        mods = config.incompatible_mods.split(";")
+        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+            for (final def one in mods) {
+                if (one.isBlank()) continue
+                if (one.startsWith("@")) {
+                    def pars = one.substring(1).split(":", 2)
+                    if (pars[0].equalsIgnoreCase("c")) {
+                        incompat.add pars[1].trim()
+                    }
+                } else
+                    incompat.add one.trim()
+            }
+
+        mods = config.embedded_mods.split(";")
+        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+            for (final def one in mods) {
+                if (one.isBlank()) continue
+                if (one.startsWith("@")) {
+                    def pars = one.substring(1).split(":", 2)
+                    if (pars[0].equalsIgnoreCase("c")) {
+                        embLibs.add pars[1].trim()
+                    }
+                } else
+                    embLibs.add one.trim()
+            }
+
+        if (reqDeps.size() > 0 || optDeps.size() > 0 || incompat.size() > 0 || embLibs.size() > 0) {
+            relations {
+                reqDeps.each { dep ->
+                    requiredDependency dep
+                }
+                optDeps.each { dep ->
+                    optionalDependency dep
+                }
+                incompat.each { dep ->
+                    incompatible dep
+                }
+                embLibs.each { dep ->
+                    embeddedLibrary dep
+                }
+            }
+        }
+    }
+}
+
+afterEvaluate {
+    if (!config.maven_url.isEmpty()) {
+        tasks["curseforge${config.cf_project}"].dependsOn.add(publish)
+        tasks["modrinth"].dependsOn.add(publish)
+    }
+}
+
+tasks.register('buildAndUploadMod') {
+    group = "upload"
+    dependsOn "curseforge${config.cf_project}", 'modrinth'
+
+    doLast {
+        println "Upload complete."
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = config.maven_group
+
+            artifact jar
+            artifact srcJar
+            artifact deobfJar
+        }
+    }
+    repositories {
+        maven {
+            url config.maven_url
+        }
+    }
 }

@@ -1,19 +1,31 @@
-#Project info
-author=Zeitheron
-start_git_commit=f44d92f5589c5901cfdd1df54ae2e5f7165dee26
-git_commit=https://gitlab.com/DragonForge/musiclayer/commit/{{hash}}
-
-#Runtime info
-forge_version=14.23.5.2847
-minecraft_version=1.12.2
-mcp=stable_39
-hl_version=12.2.46
-jei_version=4.11.0.206
 
 #Mod info
 mod_id=musiclayer
 mod_id_fancy=MusicLayer
 mod_name=Music Layer
-mod_version=12.3.21
+mod_version=12.2.22
+
+#Project info
+author=Zeitheron
+start_git_commit=0ba6f30e6c833d21e5ab5661d0f0eaaece1d9f04
+git_commit=https://github.com/dragon-forge/MusicLayer/commit/{{hash}}
+
+#Runtime info
+forge_version=14.23.5.2860
+minecraft_version=1.12.2
+mcp=stable_39
+hl_version=12.2.46
+jei_version=4.11.0.206
+
+# Maven Info
+maven_group=org.zeith.MusicLayer
+maven_url=file:///SERVER//Maven
+
 cf_project=289079
+modrinth_project=4Y5irTB9
 release_type=release
+
+required_mods=hammer-lib;
+optional_mods=
+incompatible_mods=
+embedded_mods=

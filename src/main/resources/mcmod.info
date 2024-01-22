@@ -1,7 +1,7 @@
 [
 	{
 	  "modid": "musiclayer",
-	  "name": "Music Layer",
+	  "name": "MusicLayer",
 	  "description": "A mod that adds an easy layer of music that can be manipulated/chosen by multiple mods.",
 	  "authorList": ["Zeitheron"],
 	  "logoFile": "logo.png"
