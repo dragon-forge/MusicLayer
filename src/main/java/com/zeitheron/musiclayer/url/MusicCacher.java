@@ -35,7 +35,7 @@ public class MusicCacher
 
 	private static InputStream getFileStream(final String url, String subfolder)
 	{
-		File f = new File(MusicLayerMC.mcPath, "musiclayer" + File.separator + subfolder);
+		File f = MusicLayerMC.mcPath.toPath().resolve("asm").resolve("MusicLayer").resolve(subfolder).toFile();
 		if(!f.isDirectory())
 			f.mkdirs();
 
@@ -53,8 +53,8 @@ public class MusicCacher
 					String md5 = MD5.getMD5Checksum(ff.getAbsolutePath());
 					TwoTuple<InputStream, Boolean> b = IOUtils.getInput(url);
 
-					/** Verify only if file is being loaded from online */
-					if(b.get2() == Boolean.TRUE)
+					/* Verify only if file is being loaded from online */
+					if(b.get2() != null && b.get2())
 					{
 						InputStream in = b.get1();
 						String live = getMD5Checksum(in);

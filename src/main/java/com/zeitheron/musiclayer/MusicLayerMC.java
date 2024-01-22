@@ -4,6 +4,7 @@ import com.zeitheron.hammercore.HammerCore;
 import com.zeitheron.hammercore.event.GetAllRequiredApisEvent;
 import com.zeitheron.musiclayer.api.MusicLayer;
 import com.zeitheron.musiclayer.proxy.CommonProxy;
+import lombok.var;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -18,7 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 
-@Mod(modid = "musiclayer", name = "Music Layer", version = "@VERSION@", dependencies = "required-after:hammercore", certificateFingerprint = "9f5e2a811a8332a842b34f6967b7db0ac4f24856", updateJSON = "https://dccg.herokuapp.com/api/fmluc/289079")
+@Mod(modid = "musiclayer", name = "MusicLayer", version = "@VERSION@", dependencies = "required-after:hammercore", certificateFingerprint = "9f5e2a811a8332a842b34f6967b7db0ac4f24856", updateJSON = "https://api.modrinth.com/updates/4Y5irTB9/forge_updates.json")
 public class MusicLayerMC
 {
 	@SidedProxy(clientSide = "com.zeitheron.musiclayer.proxy.ClientProxy", serverSide = "com.zeitheron.musiclayer.proxy.CommonProxy")
@@ -33,8 +34,10 @@ public class MusicLayerMC
 		File dir = Loader.instance().getConfigDir().getAbsoluteFile();
 		dir = dir.getParentFile();
 		mcPath = dir;
-
-		File SoundLib = new File(mcPath, "asm" + File.separator + "SoundLib.jar");
+		
+		var d = mcPath.toPath().resolve("asm").resolve("MusicLayer");
+		d.toFile().mkdirs();
+		File SoundLib = d.resolve("SoundLib.jar").toFile();
 		try(FileOutputStream fos = new FileOutputStream(SoundLib); InputStream in = MusicLayerMC.class.getResourceAsStream("/SoundLib.jar"))
 		{
 			byte[] buf = new byte[1024];

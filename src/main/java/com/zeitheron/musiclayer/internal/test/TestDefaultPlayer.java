@@ -13,6 +13,6 @@ public class TestDefaultPlayer
 	{
 		if(e.currentLeftTime < 5)
 			e.restart = true;
-		e.setSound(new File("C:\\Users\\Zeitheron\\Downloads\\eerie.ogg").toURI().toURL().toString());
+		e.setSound(new File("P:\\$Assets\\Terraria\\1.4.4.1\\Music\\06_Jungle.wav").toURI().toURL().toString());
 	}
 }
